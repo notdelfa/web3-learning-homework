@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>博客 API 测试</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 13px;
+      color: #222;
+      line-height: 1.4;
+    }
+    header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #ddd;
+    }
+    header h1 { font-size: 15px; font-weight: 600; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 5fr 4fr;
+      min-height: calc(100vh - 42px);
+    }
+    .nav, .center, .right {
+      padding: 12px 16px;
+      overflow-y: auto;
+    }
+    .nav {
+      border-right: 1px solid #ddd;
+    }
+    .center {
+      border-right: 1px solid #ddd;
+    }
+    .right {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-content: flex-start;
+    }
+
+    .nav-item {
+      padding: 10px 8px;
+      cursor: pointer;
+      color: #666;
+      border-left: 2px solid transparent;
+      margin-bottom: 4px;
+    }
+    .nav-item:hover { color: #222; }
+    .nav-item.active {
+      color: #222;
+      font-weight: 600;
+      border-left-color: #222;
+    }
+
+    .cat-group { display: none; }
+    .cat-group.active { display: block; }
+
+    .test {
+      border-bottom: 1px solid #eee;
+      padding: 10px 0;
+    }
+    .test:last-child { border-bottom: none; }
+    .test-name {
+      font-size: 13px;
+      margin-bottom: 8px;
+      color: #444;
+    }
+
+    .field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .field:last-of-type { margin-bottom: 0; }
+
+    .lbl {
+      width: 52px;
+      flex-shrink: 0;
+      color: #666;
+    }
+    input, select {
+      flex: 1;
+      min-width: 0;
+      padding: 5px 8px;
+      border: 1px solid #ccc;
+      font-size: 13px;
+    }
+    input[readonly] { color: #888; }
+
+    .btn-row { margin-top: 8px; }
+    .btn-row + .field { margin-top: 8px; }
+    .btn-row button {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      background: #f5f5f5;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-row button:hover { background: #eee; }
+
+    .m-get { color: #2d7a4f; }
+    .m-post { color: #1a56db; }
+    .m-put { color: #b45309; }
+    .m-del { color: #b91c1c; }
+
+    .panel h3 {
+      font-size: 12px;
+      color: #888;
+      font-weight: normal;
+      margin-bottom: 6px;
+    }
+    .panel { flex: 0 0 auto; }
+    pre {
+      border: 1px solid #ddd;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-all;
+      margin: 0;
+    }
+
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      .nav { border-right: none; border-bottom: 1px solid #ddd; display: flex; gap: 8px; }
+      .nav-item { flex: 1; text-align: center; border-left: none; border-bottom: 2px solid transparent; margin-bottom: 0; }
+      .nav-item.active { border-left-color: transparent; border-bottom-color: #222; }
+      .center { border-right: none; border-bottom: 1px solid #ddd; }
+    }
+  </style>
+</head>
+<body>
+  <header><h1>Homework04 · 博客 API</h1></header>
+
+  <div class="layout">
+    <nav class="nav">
+      <div class="nav-item active" data-cat="user" onclick="App.switchCat('user')">用户管理</div>
+      <div class="nav-item" data-cat="post" onclick="App.switchCat('post')">文章管理</div>
+      <div class="nav-item" data-cat="comment" onclick="App.switchCat('comment')">评论管理</div>
+    </nav>
+
+    <main class="center">
+      <div class="cat-group active" data-cat="user">
+      <div class="test">
+        <div class="test-name"><span class="m-post">POST</span> 注册 /api/register</div>
+        <div class="field"><span class="lbl">用户名</span><input id="regUser" value="alice"></div>
+        <div class="field"><span class="lbl">密码</span><input id="regPass" value="123456"></div>
+        <div class="field"><span class="lbl">邮箱</span><input id="regEmail" value="alice@example.com"></div>
+        <div class="btn-row"><button onclick="App.register()">注册</button></div>
+      </div>
+
+      <div class="test">
+        <div class="test-name"><span class="m-post">POST</span> 登录 /api/login</div>
+        <div class="field"><span class="lbl">用户名</span><input id="loginUser" value="alice"></div>
+        <div class="field"><span class="lbl">密码</span><input id="loginPass" value="123456"></div>
+        <div class="btn-row"><button onclick="App.login()">登录</button></div>
+        <div class="field"><span class="lbl">Token</span><input id="token" readonly placeholder="登录后自动填入"></div>
+      </div>
+      </div>
+
+      <div class="cat-group" data-cat="post">
+      <div class="test">
+        <div class="test-name"><span class="m-post">POST</span> 创建文章 /api/posts</div>
+        <div class="field"><span class="lbl">标题</span><input id="postTitle" value="Hello"></div>
+        <div class="field"><span class="lbl">内容</span><input id="postContent" value="first post"></div>
+        <div class="btn-row"><button onclick="App.sendPost()">创建</button></div>
+      </div>
+
+      <div class="test">
+        <div class="test-name"><span class="m-get">GET</span> 文章列表 /api/posts</div>
+        <div class="btn-row"><button onclick="App.listPosts()">获取列表</button></div>
+      </div>
+
+      <div class="test">
+        <div class="test-name"><span class="m-get">GET</span> 文章详情 /api/posts/:id</div>
+        <div class="field"><span class="lbl">当前</span><strong id="currentPostId">未选择</strong></div>
+        <div class="field"><span class="lbl">选择</span>
+          <select id="postSelect" onchange="App.pickPost(this)">
+            <option value="">— 先获取列表或创建 —</option>
+          </select>
+        </div>
+        <div class="btn-row"><button onclick="App.fetchPost()">获取详情</button></div>
+      </div>
+
+      <div class="test">
+        <div class="test-name"><span class="m-put">PUT</span> 更新文章 /api/posts/:id</div>
+        <div class="field"><span class="lbl">新标题</span><input id="postTitleUpd" value="Updated"></div>
+        <div class="field"><span class="lbl">新内容</span><input id="postContentUpd" value="updated"></div>
+        <div class="btn-row"><button onclick="App.updatePost()">更新</button></div>
+      </div>
+
+      <div class="test">
+        <div class="test-name"><span class="m-del">DEL</span> 删除文章 /api/posts/:id</div>
+        <div class="btn-row"><button onclick="App.removePost()">删除</button></div>
+      </div>
+      </div>
+
+      <div class="cat-group" data-cat="comment">
+      <div class="test">
+        <div class="field"><span class="lbl">文章</span>
+          <select id="postSelectCmt" onchange="App.pickPost(this)">
+            <option value="">— 先在文章管理获取列表 —</option>
+          </select>
+        </div>
+      </div>
+      <div class="test">
+        <div class="test-name"><span class="m-post">POST</span> 发表评论 /api/posts/:id/comments</div>
+        <div class="field"><span class="lbl">内容</span><input id="cmtContent" value="nice post"></div>
+        <div class="btn-row"><button onclick="App.sendComment()">发表</button></div>
+      </div>
+
+      <div class="test">
+        <div class="test-name"><span class="m-get">GET</span> 评论列表 /api/posts/:id/comments</div>
+        <div class="btn-row"><button onclick="App.listComments()">获取列表</button></div>
+      </div>
+      </div>
+    </main>
+
+    <aside class="right">
+      <div class="panel">
+        <h3>Request</h3>
+        <pre id="reqOut">// 点击按钮后显示</pre>
+      </div>
+      <div class="panel">
+        <h3>Response</h3>
+        <pre id="resOut">// 等待请求</pre>
+      </div>
+    </aside>
+  </div>
+
+<script>
+const App = {
+  $(id) { return document.getElementById(id); },
+  postID(p) { return p.ID ?? p.id; },
+
+  switchCat(cat) {
+    document.querySelectorAll(".nav-item").forEach(el => {
+      el.classList.toggle("active", el.dataset.cat === cat);
+    });
+    document.querySelectorAll(".cat-group").forEach(el => {
+      el.classList.toggle("active", el.dataset.cat === cat);
+    });
+  },
+
+  showRequest(method, path, headers, body) {
+    const h = { ...headers };
+    if (h.Authorization) h.Authorization = "Bearer ***";
+    const b = body ? { ...body } : null;
+    if (b?.password) b.password = "***";
+    this.$("reqOut").textContent = JSON.stringify({ method, url: path, headers: h, body: b }, null, 2);
+  },
+
+  showResponse(status, data) {
+    this.$("resOut").textContent = JSON.stringify({ status, data }, null, 2);
+  },
+
+  showError(msg) {
+    this.$("resOut").textContent = msg;
+  },
+
+  currentPostId() {
+    return this.$("postSelect").value || this.$("postSelectCmt").value;
+  },
+
+  syncPostSelects(fromId, toId) {
+    const from = this.$(fromId);
+    const to = this.$(toId);
+    to.innerHTML = from.innerHTML;
+    to.value = from.value;
+  },
+
+  pickPost(from) {
+    if (from) {
+      const other = from.id === "postSelect" ? "postSelectCmt" : "postSelect";
+      this.$(other).value = from.value;
+    }
+    const id = this.currentPostId();
+    this.$("currentPostId").textContent = id ? `#${id}` : "未选择";
+  },
+
+  fillPostSelect(posts) {
+    const sel = this.$("postSelect");
+    sel.innerHTML = '<option value="">— 选择文章 —</option>';
+    posts.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = this.postID(p);
+      opt.textContent = `#${this.postID(p)} ${p.title}`;
+      sel.appendChild(opt);
+    });
+    if (posts.length > 0) sel.value = this.postID(posts[0]);
+    this.syncPostSelects("postSelect", "postSelectCmt");
+    this.pickPost();
+  },
+
+  addPostOption(post) {
+    const id = this.postID(post);
+    if (!id) return;
+    for (const sid of ["postSelect", "postSelectCmt"]) {
+      const sel = this.$(sid);
+      if (!sel.querySelector(`option[value="${id}"]`)) {
+        const opt = document.createElement("option");
+        opt.value = id;
+        opt.textContent = `#${id} ${post.title}`;
+        sel.appendChild(opt);
+      }
+      sel.value = id;
+    }
+    this.pickPost();
+  },
+
+  async api(path, method = "GET", body = null, auth = false) {
+    const headers = { "Content-Type": "application/json" };
+    if (auth && this.$("token").value) {
+      headers.Authorization = "Bearer " + this.$("token").value.trim();
+    }
+    this.showRequest(method, path, headers, body);
+
+    const res = await fetch(path, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : null,
+    });
+    const data = await res.json().catch(() => ({}));
+    this.showResponse(res.status, data);
+    return { status: res.status, data };
+  },
+
+  needPostId() {
+    const id = this.currentPostId();
+    if (!id) {
+      this.showRequest("-", "-", {}, null);
+      this.showError("请先在列表中选择文章，或创建新文章");
+      return null;
+    }
+    return id;
+  },
+
+  async register() {
+    await this.api("/api/register", "POST", {
+      username: this.$("regUser").value,
+      password: this.$("regPass").value,
+      email: this.$("regEmail").value,
+    });
+  },
+
+  async login() {
+    const { data } = await this.api("/api/login", "POST", {
+      username: this.$("loginUser").value,
+      password: this.$("loginPass").value,
+    });
+    if (data.token) this.$("token").value = data.token;
+  },
+
+  async sendPost() {
+    const { data } = await this.api("/api/posts", "POST", {
+      title: this.$("postTitle").value,
+      content: this.$("postContent").value,
+    }, true);
+    this.addPostOption(data);
+  },
+
+  async listPosts() {
+    const { data } = await this.api("/api/posts");
+    if (Array.isArray(data)) this.fillPostSelect(data);
+  },
+
+  async fetchPost() {
+    const id = this.needPostId();
+    if (id) await this.api("/api/posts/" + id);
+  },
+
+  async updatePost() {
+    const id = this.needPostId();
+    if (!id) return;
+    await this.api("/api/posts/" + id, "PUT", {
+      title: this.$("postTitleUpd").value,
+      content: this.$("postContentUpd").value,
+    }, true);
+  },
+
+  async removePost() {
+    const id = this.needPostId();
+    if (!id) return;
+    await this.api("/api/posts/" + id, "DELETE", null, true);
+    await this.listPosts();
+  },
+
+  async sendComment() {
+    const id = this.needPostId();
+    if (!id) return;
+    await this.api("/api/posts/" + id + "/comments", "POST", {
+      content: this.$("cmtContent").value,
+    }, true);
+  },
+
+  async listComments() {
+    const id = this.needPostId();
+    if (id) await this.api("/api/posts/" + id + "/comments");
+  },
+};
+</script>
+</body>
+</html>
