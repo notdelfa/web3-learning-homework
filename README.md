@@ -11,5 +11,6 @@ Web3 课程学习过程中的作业与练习代码。
   - 大作业：[个人博客 API](week02_04_golang_hw/homework04/README.md)
 - [`week05_07_solidity_hw/`](week05_07_solidity_hw/) — Solidity 作业（week05–07）
   - 小作业：[讨饭合约 BeggingContract](week05_07_solidity_hw/contract/README.md)
+  - 大作业：[NFT 拍卖市场](week05_07_solidity_hw/nft/README.md)
 
 各作业说明见对应目录内的 README。
