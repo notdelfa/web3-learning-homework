@@ -5,4 +5,12 @@
 **部署网络**：Sepolia 测试网  
 **合约地址**：https://sepolia.etherscan.io/address/0x5818F442e0d4dc86E8D61f1E51Eff54Ca028972D
 
-**测试截图**：`BeggingContract1.png`（Remix 部署与调用）、`BeggingContract2.png`（Etherscan 交易记录）
+**测试截图**
+
+Remix 部署与调用（`week05_07_solidity_hw/contract/BeggingContract1.png`）
+
+![Remix 部署与调用](BeggingContract1.png)
+
+Etherscan 交易记录（`week05_07_solidity_hw/contract/BeggingContract2.png`）
+
+![Etherscan 交易记录](BeggingContract2.png)
