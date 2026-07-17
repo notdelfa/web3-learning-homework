@@ -1,0 +1,22 @@
+{
+  "network": {
+    "chainId": "11155111",
+    "name": "sepolia"
+  },
+  "deployer": "0xfA05ce2Fa1Ef87F8dc76623E2fb5072bDd61C31d",
+  "contracts": {
+    "SimpleNFT": "0x505a8e2A3420c979AD043a4d83398b10fc74E739",
+    "MockERC20": "0xFc782Bd81e0De3B171EDE8c31BA9F13e3b87709C",
+    "ethUsdFeed": "0x694AA1769357215DE4FAC081bf1f309aDC325306",
+    "tokenUsdFeed": "0x8ff11ef66112C3293a2BbcE3D52C962f0bEd3021"
+  },
+  "auctions": [
+    {
+      "kind": "uups",
+      "impl": "0xeE3F22f8E5320663c318879BDf94D07f4A292325",
+      "proxy": "0x36254D13134B8Cf5E38CB31f8b2794AF3c79F9a7",
+      "auction": "0x36254D13134B8Cf5E38CB31f8b2794AF3c79F9a7"
+    }
+  ],
+  "deployedAt": "2026-07-17T06:16:41.976Z"
+}
