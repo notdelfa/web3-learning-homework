@@ -94,13 +94,22 @@ npx hardhat run scripts/deploy.ts --network sepolia --build-profile production
 
 ## 链上验证
 
-**脚本（一键）：**
+### 脚本（一键）
 
 ```bash
 npx hardhat run scripts/demo-auction.ts --network sepolia
 ```
 
-**图形化：** Etherscan → Contract → Write Contract → Connect MetaMask  
-顺序：`mint` → `approve(proxy, tokenId)` → `createAuction` → `bid` → 到期后 `endAuction`。
+### 图形化（Etherscan + MetaMask）
 
+MetaMask 切 **Sepolia** → 打开合约页 **Write Contract** → **Connect to Web3**。金额：`0.001 ETH = 1000000000000000` wei。
 
+| 步骤 | 页面 | 操作 |
+| --- | --- | --- |
+| ① mint | [SimpleNFT Write](https://sepolia.etherscan.io/address/0x505a8e2A3420c979AD043a4d83398b10fc74E739#writeContract) | `mint(你的地址)`；[Read](https://sepolia.etherscan.io/address/0x505a8e2A3420c979AD043a4d83398b10fc74E739#readContract) 用 `ownerOf` 确认 `tokenId`（多为 `0`） |
+| ② approve | 同上 | `approve(0x36254D13134B8Cf5E38CB31f8b2794AF3c79F9a7, tokenId)` |
+| ③ 上架 | [Auction Write](https://sepolia.etherscan.io/address/0x36254D13134B8Cf5E38CB31f8b2794AF3c79F9a7#writeContract) | `createAuction(nft地址, tokenId, 0x000…000, 1000000000000000, 300)`；`auctionId = nextAuctionId - 1` |
+| ④ 出价 | 同上 | `bid(auctionId, 0)`，**payable** 填 `0.001` ETH；再出更高价改 `0.002` |
+| ⑤ 结算 | 同上 | 到期后 `endAuction(auctionId)`；用 `ownerOf` / `auctions` 核对 |
+
+ERC20：`paymentToken` 用 MockERC20；先 `mint`+`approve(proxy)`，再 `bid(id, amount)`，payable=`0`。
