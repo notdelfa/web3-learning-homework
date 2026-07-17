@@ -24,6 +24,26 @@ nft/
 └── deployments/sepolia.json       # Sepolia 部署地址
 ```
 
+## 测试报告
+
+详见 [`TEST_REPORT.md`](TEST_REPORT.md)。生成方式：
+
+```bash
+npx hardhat test                 # 测试结果
+npx hardhat test --coverage      # 覆盖率（控制台 + coverage/html）
+```
+### 已部署地址（Sepolia）
+
+查看地址（Auction proxy）：https://sepolia.etherscan.io/address/0x36254D13134B8Cf5E38CB31f8b2794AF3c79F9a7
+
+| 合约 | 地址 |
+| --- | --- |
+| SimpleNFT | [`0x505a8e2A3420c979AD043a4d83398b10fc74E739`](https://sepolia.etherscan.io/address/0x505a8e2A3420c979AD043a4d83398b10fc74E739) |
+| MockERC20 | [`0xFc782Bd81e0De3B171EDE8c31BA9F13e3b87709C`](https://sepolia.etherscan.io/address/0xFc782Bd81e0De3B171EDE8c31BA9F13e3b87709C) |
+| Auction **proxy** | [`0x36254D13134B8Cf5E38CB31f8b2794AF3c79F9a7`](https://sepolia.etherscan.io/address/0x36254D13134B8Cf5E38CB31f8b2794AF3c79F9a7) |
+| Auction impl | [`0xeE3F22f8E5320663c318879BDf94D07f4A292325`](https://sepolia.etherscan.io/address/0xeE3F22f8E5320663c318879BDf94D07f4A292325) |
+| ETH/USD | Chainlink [`0x694AA1769357215DE4FAC081bf1f309aDC325306`](https://sepolia.etherscan.io/address/0x694AA1769357215DE4FAC081bf1f309aDC325306) |
+
 ## 功能说明
 
 | 功能 | 说明 |
@@ -44,7 +64,7 @@ nft/
 | 实现 | `NFTAuctionUUPS` | `NFTAuctionBase` |
 | 谁升级 | 合约 `owner` | `ProxyAdmin.owner` |
 
-## 本地
+## 本地测试
 
 ```bash
 cd week05_07_solidity_hw/nft
@@ -52,7 +72,7 @@ npm install
 npx hardhat test
 ```
 
-## 部署 Sepolia
+## 部署测试（Sepolia）
 
 1. 账户需有 Sepolia ETH；准备 RPC（建议 Alchemy，公共节点易限流）。
 2. 配置环境变量（勿提交私钥）：
@@ -72,18 +92,6 @@ npx hardhat run scripts/deploy.ts --network sepolia --build-profile production
 中断后续跑可复用地址：`EXISTING_NFT` / `EXISTING_MOCK_TOKEN` / `EXISTING_TOKEN_USD_FEED`。  
 结果写入 `deployments/sepolia.json`。
 
-### 已部署地址（Sepolia）
-
-| 合约 | 地址 |
-| --- | --- |
-| SimpleNFT | [`0x505a8e2A...E739`](https://sepolia.etherscan.io/address/0x505a8e2A3420c979AD043a4d83398b10fc74E739) |
-| MockERC20 | [`0xFc782Bd8...709C`](https://sepolia.etherscan.io/address/0xFc782Bd81e0De3B171EDE8c31BA9F13e3b87709C) |
-| Auction **proxy** | [`0x36254D13...F9a7`](https://sepolia.etherscan.io/address/0x36254D13134B8Cf5E38CB31f8b2794AF3c79F9a7) |
-| Auction impl | [`0xeE3F22f8...2325`](https://sepolia.etherscan.io/address/0xeE3F22f8E5320663c318879BDf94D07f4A292325) |
-| ETH/USD | Chainlink `0x694AA176...5306` |
-
-查看地址（Auction proxy）：https://sepolia.etherscan.io/address/0x36254D13134B8Cf5E38CB31f8b2794AF3c79F9a7
-
 ## 链上验证
 
 **脚本（一键）：**
@@ -95,11 +103,4 @@ npx hardhat run scripts/demo-auction.ts --network sepolia
 **图形化：** Etherscan → Contract → Write Contract → Connect MetaMask  
 顺序：`mint` → `approve(proxy, tokenId)` → `createAuction` → `bid` → 到期后 `endAuction`。
 
-## 测试报告
 
-详见 [`TEST_REPORT.md`](TEST_REPORT.md)。生成方式：
-
-```bash
-npx hardhat test                 # 测试结果
-npx hardhat test --coverage      # 覆盖率（控制台 + coverage/html）
-```
