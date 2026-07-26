@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>Homework05 任务二</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font: 13px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #222; max-width: 720px; margin: 0 auto; padding: 20px 16px 40px; }
+    h1 { font-size: 16px; margin-bottom: 4px; }
+    .sub { color: #666; margin-bottom: 16px; }
+    section { border: 1px solid #ddd; padding: 14px 16px; margin-bottom: 12px; }
+    h2 { font-size: 14px; margin-bottom: 10px; }
+    .field { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .lbl { width: 72px; color: #555; flex-shrink: 0; }
+    input { flex: 1; border: 1px solid #ccc; padding: 6px 8px; font: inherit; }
+    button { border: 1px solid #222; background: #222; color: #fff; padding: 6px 14px; font: inherit; cursor: pointer; margin-top: 4px; }
+    pre { margin-top: 10px; background: #f6f6f6; padding: 10px; white-space: pre-wrap; word-break: break-all; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Homework05 · 任务二</h1>
+  <p class="sub">测试前先设置：export ETH_RPC_URL=...（含 API Key）与 PRIVATE_KEY=...</p>
+
+  <section>
+    <h2>0. 部署</h2>
+    <button onclick="doDeploy()">部署 Counter</button>
+    <pre id="deployOut"></pre>
+  </section>
+
+  <section>
+    <h2>1. 读 number</h2>
+    <button onclick="getNumber()">查询</button>
+    <pre id="numOut"></pre>
+  </section>
+
+  <section>
+    <h2>2. increment()</h2>
+    <button onclick="doInc()">执行</button>
+    <pre id="incOut"></pre>
+  </section>
+
+  <section>
+    <h2>3. setNumber(n)</h2>
+    <div class="field"><span class="lbl">新数值</span><input id="newNum" type="number" value="0"></div>
+    <button onclick="doSet()">设置</button>
+    <pre id="setOut"></pre>
+  </section>
+
+  <script>
+    function show(el, req, res) {
+      el.textContent =
+        '=== Request ===\n' + JSON.stringify(req, null, 2) +
+        '\n\n=== Response ===\n' + JSON.stringify(res, null, 2);
+    }
+
+    async function call(elId, method, path, body) {
+      const el = document.getElementById(elId);
+      const req = { method, path, body };
+      show(el, req, '等待中…');
+      const opts = { method };
+      if (body != null) {
+        opts.headers = { 'Content-Type': 'application/json' };
+        opts.body = JSON.stringify(body);
+      }
+      try {
+        const res = await fetch(path, opts);
+        const data = await res.json();
+        show(el, req, { status: res.status, body: data });
+        return data;
+      } catch (e) {
+        show(el, req, { error: String(e) });
+      }
+    }
+
+    async function doDeploy() {
+      const data = await call('deployOut', 'POST', '/api/deploy', {});
+      if (data && data.contract) getNumber();
+    }
+    function getNumber() { return call('numOut', 'GET', '/api/number', null); }
+    function doInc() { return call('incOut', 'POST', '/api/increment', {}); }
+    function doSet() {
+      return call('setOut', 'POST', '/api/set', {
+        number: Number(document.getElementById('newNum').value),
+      });
+    }
+  </script>
+</body>
+</html>

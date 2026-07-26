@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>Homework05 任务一</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font: 13px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #222; max-width: 720px; margin: 0 auto; padding: 20px 16px 40px; }
+    h1 { font-size: 16px; margin-bottom: 4px; }
+    .sub { color: #666; margin-bottom: 16px; }
+    section { border: 1px solid #ddd; padding: 14px 16px; margin-bottom: 12px; }
+    h2 { font-size: 14px; margin-bottom: 10px; }
+    .field { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .lbl { width: 72px; color: #555; flex-shrink: 0; }
+    input { flex: 1; border: 1px solid #ccc; padding: 6px 8px; font: inherit; }
+    button { border: 1px solid #222; background: #222; color: #fff; padding: 6px 14px; font: inherit; cursor: pointer; margin-top: 4px; }
+    pre { margin-top: 10px; background: #f6f6f6; padding: 10px; white-space: pre-wrap; word-break: break-all; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Homework05 · 任务一</h1>
+  <p class="sub">测试前先设置：export ETH_RPC_URL=...（含 API Key）与 PRIVATE_KEY=...</p>
+
+  <section>
+    <h2>1. 查区块</h2>
+    <div class="field"><span class="lbl">区块号</span><input id="blockNum" type="number" value="0"></div>
+    <button onclick="queryBlock()">查询</button>
+    <pre id="blockOut"></pre>
+  </section>
+
+  <section>
+    <h2>2. 发转账</h2>
+    <div class="field"><span class="lbl">收款地址</span><input id="to" placeholder="0x..."></div>
+    <div class="field"><span class="lbl">金额 ETH</span><input id="amount" type="number" step="0.0001" value="0.001"></div>
+    <button onclick="sendTx()">发送</button>
+    <pre id="sendOut"></pre>
+  </section>
+
+  <section>
+    <h2>3. 查确认区块</h2>
+    <div class="field"><span class="lbl">交易哈希</span><input id="txHash" placeholder="0x..."></div>
+    <button onclick="queryTx()">查询</button>
+    <pre id="txOut"></pre>
+  </section>
+
+  <script>
+    function show(el, req, res) {
+      el.textContent =
+        '=== Request ===\n' + JSON.stringify(req, null, 2) +
+        '\n\n=== Response ===\n' + JSON.stringify(res, null, 2);
+    }
+
+    // body = 请求对象；GET→query，POST→JSON body
+    async function call(elId, method, path, body) {
+      const el = document.getElementById(elId);
+      const req = { method, path, body };
+      show(el, req, '等待中…');
+      let url = path;
+      const opts = { method };
+      if (method === 'GET' && body) {
+        const q = Object.fromEntries(Object.entries(body).map(([k, v]) => [k, String(v)]));
+        url += '?' + new URLSearchParams(q).toString();
+      } else if (body != null) {
+        opts.headers = { 'Content-Type': 'application/json' };
+        opts.body = JSON.stringify(body);
+      }
+      try {
+        const res = await fetch(url, opts);
+        const data = await res.json();
+        show(el, req, { status: res.status, body: data });
+        return data;
+      } catch (e) {
+        show(el, req, { error: String(e) });
+      }
+    }
+
+    function queryBlock() {
+      return call('blockOut', 'GET', '/api/block', {
+        number: document.getElementById('blockNum').value || '0',
+      });
+    }
+
+    async function sendTx() {
+      const data = await call('sendOut', 'POST', '/api/send', {
+        to: document.getElementById('to').value.trim(),
+        amount: parseFloat(document.getElementById('amount').value),
+      });
+      if (data && data.txHash) document.getElementById('txHash').value = data.txHash;
+    }
+
+    function queryTx() {
+      return call('txOut', 'GET', '/api/tx', {
+        hash: document.getElementById('txHash').value.trim(),
+      });
+    }
+  </script>
+</body>
+</html>
