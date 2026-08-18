@@ -1,0 +1,8 @@
+node_modules
+cache
+artifacts
+coverage
+ignition/deployments
+.openzeppelin
+.env
+*.log

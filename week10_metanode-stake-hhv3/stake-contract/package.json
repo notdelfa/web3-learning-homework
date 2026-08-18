@@ -1,0 +1,22 @@
+{
+  "name": "metanode-stake-hhv3",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "coverage": "hardhat test --coverage",
+    "deploy:token": "hardhat ignition deploy ignition/modules/MetaNode.js",
+    "deploy:stake": "hardhat run scripts/MetaNodeStake.js"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox-mocha-ethers": "^3.0.0",
+    "@openzeppelin/hardhat-upgrades": "^4.0.0",
+    "hardhat": "^3.6.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2",
+    "@openzeppelin/contracts-upgradeable": "^5.0.2"
+  }
+}
