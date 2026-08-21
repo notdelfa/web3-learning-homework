@@ -15,6 +15,9 @@ Web3 课程学习过程中的作业与练习代码。
 - [`week08_dapp_ethclient/`](week08_dapp_ethclient/README.md) — go-ethereum ethclient（查链 / 转账 / abigen）
   - 任务一：[查区块 / 转账](week08_dapp_ethclient/task1-query/)
   - 任务二：[abigen Counter](week08_dapp_ethclient/task2-abigen/)
-- [`week10_metanode-stake-hhv3/`](week10_metanode-stake-hhv3/README.md) — MetaNode Stake（Hardhat 3）
+- [`week10_contract/`](week10_contract/) — 合约相关作业（week10）
+  - [常用 ERC/EIP 标准整理](week10_contract/erc-eip-standards/README.md)
+  - [MetaNode Stake HH3](week10_contract/metanode-stake-hhv3/README.md)
+  - [MetaNodeSwap](week10_contract/metanode-swap/README.md)
 
 各作业说明见对应目录内的 README。
